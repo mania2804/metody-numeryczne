@@ -1,0 +1,47 @@
+close all; clear all; clc;
+
+A = [ 1 2;
+    3 4 ];
+
+b = [ 5;
+    11 ];
+
+x2 = A\b,
+x1 =inv(A)*b
+
+bhat = A*x1,
+err = max(abs(x1-x2))
+
+% Macierz 2x2 - prosty wzór 4.31
+function [x] = Aprosty(A)
+x = [ A(2,2) -A(1,2); -A(2,1) A(1,1) ] / det(A);
+end
+x4 = Aprosty(A)*b
+
+
+% Metoda macierzy dołączonej iteracyjnie
+function minor = usuniecie_i_j(A, r, c) % Minor po usunieciu r i c
+minor = A([1:r-1, r+1:end], [1:c-1, c+1:end]);
+end
+
+function [Adrc] = adj(A, r, c) % Wzór 4.30 Elementy macierzy dopełnienia
+Adrc = (-1)^(r+c) * det(usuniecie_i_j(A, r, c));
+end
+
+function [Ad] = macierz_dolaczona(A) % Macierz dopełnienia algebraicznego (minorów) powstaje macierz dołączona do A
+n = size(A, 1);
+Ad = zeros(n);
+for r = 1:n
+    for c = 1:n
+        Ad(c, r) = adj(A, r, c);
+    end
+end
+end
+
+function [Aod] = macierz_odwrotna(A)
+Aod = (1/det(A)) * macierz_dolaczona(A);
+end
+
+K = [2 5 7; 6 3 4; 5 -2 -3];
+
+Kod = macierz_odwrotna(K),
